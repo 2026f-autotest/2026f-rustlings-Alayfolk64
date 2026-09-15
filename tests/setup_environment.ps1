@@ -30,19 +30,78 @@ function rustup.exe {
 function cargo.exe {
     $script:Calls.Add('cargo ' + ($args -join ' '))
     if ($env:RUSTUP_DIST_SERVER -ne 'https://rsproxy.cn') { throw 'Mirror absent during Cargo invocation' }
-    if ($env:RUSTUP_TOOLCHAIN -ne '1.98.1-x86_64-pc-windows-gnu') { throw 'GNU toolchain absent during Cargo invocation' }
+    if ($env:RUSTUP_TOOLCHAIN -ne '1.98.1-x86_64-pc-windows-msvc') { throw 'MSVC toolchain absent during Cargo invocation' }
     $global:LASTEXITCODE = if ($script:FailStage -eq 'cargo') { 43 } else { 0 }
 }
+function vswhere.exe {
+    $global:LASTEXITCODE = 0
+    if ($args -contains '-requires') {
+        if ($script:MsvcInstalled) { return 'C:\Program Files\Microsoft Visual Studio\2022\BuildTools' }
+    } elseif ($script:FailStage -eq 'msvc_modify') {
+        return 'C:\Program Files\Microsoft Visual Studio\2022\BuildTools'
+    }
+}
+function Invoke-WebRequest {
+    param($Uri, $OutFile, [switch]$UseBasicParsing)
+    if ($Uri -ne 'https://aka.ms/vs/17/release/vs_buildtools.exe') { throw "Unexpected download: $Uri" }
+    $script:Calls.Add('download Build Tools')
+}
+function Get-AuthenticodeSignature {
+    param($LiteralPath)
+    return [pscustomobject]@{
+        Status = if ($script:FailStage -eq 'msvc_signature') { 'NotSigned' } else { 'Valid' }
+        SignerCertificate = [pscustomobject]@{ Subject = 'CN=Microsoft Corporation, O=Microsoft Corporation, C=US' }
+    }
+}
+function Start-Process {
+    param($FilePath, $ArgumentList, $Verb, [switch]$Wait, [switch]$PassThru)
+    if ($Verb -ne 'RunAs' -or -not $Wait -or -not $PassThru) { throw 'Installer elevation or waiting missing' }
+    foreach ($argument in @('--norestart', '--passive', '--wait',
+            'Microsoft.VisualStudio.Component.VC.Tools.x86.x64', 'Microsoft.VisualStudio.Component.Windows11SDK.22621')) {
+        if ($ArgumentList -notcontains $argument) { throw "Installer argument missing: $argument" }
+    }
+    if ($script:FailStage -eq 'msvc_modify') {
+        if ($ArgumentList[0] -ne 'modify' -or
+            $ArgumentList[2] -ne '"C:\Program Files\Microsoft Visual Studio\2022\BuildTools"') {
+            throw 'Existing Build Tools path was not quoted for modification'
+        }
+    }
+    $script:Calls.Add('install Build Tools')
+    $script:MsvcInstalled = $script:FailStage -ne 'msvc_missing'
+    $code = switch ($script:FailStage) {
+        'msvc_failure' { 1603 }
+        'msvc_reboot' { 3010 }
+        default { 0 }
+    }
+    return [pscustomobject]@{ ExitCode = $code }
+}
 try {
-    foreach ($stage in @('success', 'install', 'cargo')) {
+    foreach ($stage in @('success', 'msvc_install', 'msvc_modify', 'msvc_failure',
+            'msvc_reboot', 'msvc_missing', 'msvc_signature', 'install', 'cargo')) {
         $script:FailStage = $stage
+        $script:MsvcInstalled = -not $stage.StartsWith('msvc_')
         $script:Calls.Clear()
         if ($stage -eq 'success' -and (Test-Path $config)) { [IO.File]::Delete($config) }
         $caught = $null
         try { . $setup } catch { $caught = $_ }
-        if ($stage -eq 'success' -and $caught) { throw $caught }
-        if ($stage -ne 'success' -and -not $caught) { throw 'Native command failure was ignored' }
+        $shouldPass = $stage -in @('success', 'msvc_install', 'msvc_modify')
+        if ($shouldPass -and $caught) { throw $caught }
+        if (-not $shouldPass -and -not $caught) { throw 'Native command failure was ignored' }
         if ($caught) { Write-Output ('Expected failure: ' + $caught.Exception.Message) }
+        $expectedError = switch ($stage) {
+            'msvc_failure' { 'exited with code 1603' }
+            'msvc_reboot' { 'requires a Windows restart' }
+            'msvc_missing' { 'still missing after installation' }
+            'msvc_signature' { 'signature verification failed' }
+            'install' { 'exited with code 42' }
+            'cargo' { 'exited with code 43' }
+        }
+        if ($caught -and $caught.Exception.Message -notlike "*$expectedError*") { throw $caught }
+        if ($stage -in @('success', 'install', 'cargo', 'msvc_signature') -and
+            $script:Calls.Contains('install Build Tools')) { throw 'Build Tools installed unnecessarily or without signature validation' }
+        if ($stage.StartsWith('msvc_') -and -not $shouldPass -and $script:Calls.Contains('cargo run -- watch')) {
+            throw 'Cargo started after an unsuccessful Build Tools installation'
+        }
         foreach ($name in $names) {
             if ([Environment]::GetEnvironmentVariable($name, 'Process') -cne $before[$name]) {
                 throw "Environment leaked: $name"
@@ -50,9 +109,9 @@ try {
         }
         if ((Get-Location).Path -cne $root) { throw 'Working directory leaked' }
         if ([Net.ServicePointManager]::SecurityProtocol -ne $protocol) { throw 'TLS setting leaked' }
-        if ($stage -eq 'success') {
+        if ($shouldPass) {
             if (-not $script:Calls.Contains('cargo run -- watch')) { throw 'Watch was not started' }
-            if (-not $script:Calls.Contains('rustup override set 1.98.1-x86_64-pc-windows-gnu --path ' + $root)) {
+            if (-not $script:Calls.Contains('rustup override set 1.98.1-x86_64-pc-windows-msvc --path ' + $root)) {
                 throw 'Repository override missing'
             }
             if ([IO.File]::ReadAllText($config) -notmatch 'sparse\+https://rsproxy.cn/index/') { throw 'Local mirror config missing' }

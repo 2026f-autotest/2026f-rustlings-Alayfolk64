@@ -41,6 +41,8 @@ Actions 中 **Test exercises and calculate score** 变红表示还有未完成�
 powershell -NoProfile -ExecutionPolicy Bypass -File .\setup-windows.ps1
 ```
 
+脚本会自动安装所需的 Microsoft C++ Build Tools、Windows SDK 和 Rust 工具链，无需手动勾选组件。出现 Windows 管理员权限提示时允许安装；如提示重启，重启后再次运行该命令。
+
 **macOS / Linux**：在终端中运行：
 
 ```sh
