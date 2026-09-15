@@ -35,4 +35,4 @@ git push origin main
 
 Actions 中 **Test exercises and calculate score** 变红表示还有未完成的题目；**Save measured score and upload to OpenCamp** 成功表示成绩同步成功。每道题的原始日志和成绩明细保存在该次运行的附件中。
 
-[学员指南](docs/STUDENT_GUIDE.md) · [维护说明](docs/MAINTAINER.md) · [上游原始说明](docs/UPSTREAM-2026s.md)
+[学员指南](docs/STUDENT_GUIDE.md)
