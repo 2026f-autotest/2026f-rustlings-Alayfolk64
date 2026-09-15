@@ -9,13 +9,13 @@
 3. 克隆分配的仓库，在 `main` 分支完成 `exercises/` 中的练习。
 4. 提交并 push，在仓库 **Actions** 查看评测和上传结果，在 [OpenCamp 本阶段排行榜](https://opencamp.cn/os2edu/camp/2026fall/stage/2) 查看成绩。
 
-本地安装 Git 和 [Rust](https://www.rust-lang.org/tools/install) 后，在自己的作业仓库中运行：
+首次使用时，按照[学员指南](docs/STUDENT_GUIDE.md)完成一次环境配置。之后在自己的作业仓库目录运行：
 
 ```sh
-cargo run --locked -- watch
+cargo run -- watch
 ```
 
-此命令使用仓库固定的依赖启动练习；按照终端提示修改题目，完成后移除该题的 `I AM NOT DONE` 注释。
+按照终端提示修改题目，完成后移除该题的 `I AM NOT DONE` 注释。
 
 完成一部分练习后提交：
 
