@@ -6,16 +6,12 @@
 
 1. 加入 [OpenCamp 秋冬季训练营](https://opencamp.cn/os2edu/camp/2026fall)，并绑定自己的 GitHub 账号。
 2. 点击[领取作业仓库](https://github.com/2026f-autotest/enroll/issues/new?template=rustlings.yml)，点击 **Create** 提交申请；等待机器人回复，然后接受仓库邀请。
-3. 克隆分配的仓库，在 `main` 分支完成 `exercises/` 中的练习。
+3. 安装 Git 并克隆分配的仓库，在 `main` 分支完成 `exercises/` 中的练习。
 4. 提交并 push，在仓库 **Actions** 查看评测和上传结果，在 [OpenCamp 本阶段排行榜](https://opencamp.cn/os2edu/camp/2026fall/stage/2) 查看成绩。
 
-首次使用时，按照[学员指南](docs/STUDENT_GUIDE.md)完成一次环境配置。之后在自己的作业仓库目录运行：
+OpenCamp 绑定的账号、领取仓库的账号和推送使用的 GitHub 账号应一致。
 
-```sh
-cargo run -- watch
-```
-
-按照终端提示修改题目，完成后移除该题的 `I AM NOT DONE` 注释。
+首次使用时，先完成下面的[环境配置](#环境配置)。
 
 完成一部分练习后提交：
 
@@ -35,7 +31,35 @@ git push origin main
 
 Actions 中 **Test exercises and calculate score** 变红表示还有未完成的题目；**Save measured score and upload to OpenCamp** 成功表示成绩同步成功。每道题的原始日志和成绩明细保存在该次运行的附件中。
 
-[学员指南](docs/STUDENT_GUIDE.md)
+## 环境配置
+
+进入自己的作业仓库目录，按照操作系统执行一次配置命令。
+
+**Windows（64 位 Intel / AMD）**：在 PowerShell 中运行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\setup-windows.ps1
+```
+
+**macOS / Linux**：在终端中运行：
+
+```sh
+bash setup.sh
+```
+
+此命令使用 Bash 执行配置脚本。macOS 需要先安装 Command Line Tools，Linux 需要系统 C 编译器。
+
+脚本会准备课程需要的 Rust 环境，并直接启动练习。按照终端提示修改题目，完成后移除对应的 `I AM NOT DONE` 注释。输入 `quit` 退出。
+
+### 以后继续练习
+
+重新打开终端，进入作业仓库目录，运行：
+
+```sh
+cargo run -- watch
+```
+
+此命令启动练习检查器，保存题目后自动重新检查。
 
 ## 练习顺序与教材章节
 
