@@ -19,8 +19,6 @@ OpenCamp 绑定的账号、领取仓库的账号和推送使用的 GitHub 账号
 powershell -NoProfile -ExecutionPolicy Bypass -File .\setup-windows.ps1
 ```
 
-此命令在独立的 PowerShell 进程中执行配置脚本；`-NoProfile` 跳过个人配置，`-ExecutionPolicy Bypass` 只在该进程中允许脚本运行，`-File` 指定脚本。
-
 **macOS / Linux**：在终端中运行：
 
 ```sh
