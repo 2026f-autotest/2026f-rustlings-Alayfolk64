@@ -36,3 +36,35 @@ git push origin main
 Actions 中 **Test exercises and calculate score** 变红表示还有未完成的题目；**Save measured score and upload to OpenCamp** 成功表示成绩同步成功。每道题的原始日志和成绩明细保存在该次运行的附件中。
 
 [学员指南](docs/STUDENT_GUIDE.md)
+
+## 练习顺序与教材章节
+
+建议配合 [《Rust 程序设计语言》（Rust Book）](https://rustwiki.org/zh-CN/book/) 学习，按照下表顺序阅读教材并完成 `exercises/` 中的练习。
+
+| 顺序 | 练习目录 | 对应教材内容 |
+|---:|---|---|
+| 1 | `intro` | §1.2：Hello, World! |
+| 2 | `variables` | §3.1：变量与可变性 |
+| 3 | `primitive_types` | §3.2：数据类型；切片部分结合 §4.3 |
+| 4 | `functions` | §3.3：函数 |
+| 5 | `if` | §3.5：控制流 |
+| 6 | `move_semantics` | §4.1–4.2：所有权、引用与借用 |
+| 7 | `structs` | 第 5 章：结构体 |
+| 8 | `enums` | 第 6 章：枚举与模式匹配 |
+| 9 | `options` | §6.1–6.3：`Option`、`match` 与 `if let` |
+| 10 | `modules` | 第 7 章：包、Crate 与模块 |
+| 11 | `vecs` | §8.1：Vector |
+| 12 | `strings` | §8.2：字符串 |
+| 13 | `hashmaps` | §8.3：HashMap |
+| 14 | `error_handling` | 第 9 章：错误处理 |
+| 15 | `generics` | §10.1：泛型数据类型 |
+| 16 | `traits` | §10.2：Trait |
+| 17 | `lifetimes` | §10.3：生命周期 |
+| 18 | `tests` | 第 11 章：自动化测试，先完成 `tests1–4` |
+| 19 | `iterators` | §13.2–13.4：迭代器 |
+| 20 | `smart_pointers` | 第 15 章：智能指针；`Arc` 结合 §16.3 |
+| 21 | `threads` | 第 16 章：并发编程 |
+| 22 | `macros` | §19.5：宏 |
+| 23 | `clippy` | 附录 D：开发工具 |
+| 24 | `conversions` | 补充练习：类型转换，参考[标准库文档](https://doc.rust-lang.org/std/convert/index.html) |
+| 25 | `algorithm` | 补充练习：数据结构与算法 |
